@@ -11,7 +11,14 @@
           outlined
         />
 
-        <div class="flex justify-end">
+        <q-option-group
+          v-model="side"
+          :options="options"
+          color="primary"
+          inline
+        />
+
+        <div class="button-containers">
           <q-btn
             :loading="loading"
             color="primary"
@@ -25,7 +32,7 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "FileContainer",
@@ -35,9 +42,24 @@ export default defineComponent({
   },
   emits: ["update:file", "submit"],
   setup(props, { emit }) {
+    const side = ref(0);
+
     return {
+      side,
+      options: [
+        {
+          label: "Document front side",
+          value: 0,
+        },
+        {
+          label: "Document back side",
+          value: 1,
+        },
+      ],
       onSubmit(evt) {
         const formData = new FormData(evt.target);
+
+        formData.append("documentSide", side.value);
 
         emit("submit", formData);
       },
@@ -54,5 +76,10 @@ export default defineComponent({
   display: flex;
   flex-direction: column;
   gap: $flex-gutter-md;
+
+  .button-containers {
+    display: flex;
+    justify-content: flex-end;
+  }
 }
 </style>

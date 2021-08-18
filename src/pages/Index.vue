@@ -1,10 +1,32 @@
 <template>
   <q-page class="page-index">
-    <file-container
-      v-model:file="file"
-      :loading="loading"
-      @submit="postImage"
-    />
+    <q-card>
+      <q-tabs v-model="tab">
+        <q-tab name="file">
+          <q-icon name="file_upload" size="sm" />
+          <span>File</span>
+        </q-tab>
+
+        <q-tab name="camera">
+          <q-icon name="photo_camera" size="sm" />
+          <span>Camera</span>
+        </q-tab>
+      </q-tabs>
+
+      <q-tab-panels v-model="tab" animated>
+        <q-tab-panel name="file">
+          <file-container
+            v-model:file="file"
+            :loading="loading"
+            @submit="postImage"
+          />
+        </q-tab-panel>
+
+        <q-tab-panel name="camera">
+          <!-- <camera-container /> -->
+        </q-tab-panel>
+      </q-tab-panels>
+    </q-card>
 
     <image-container v-if="responseImage" :src="responseImage" />
   </q-page>
@@ -15,11 +37,13 @@ import { defineComponent, ref } from "vue";
 import { useQuasar } from "quasar";
 import { post } from "axios";
 import FileContainer from "src/components/FileContainer.vue";
+// import CameraContainer from "src/components/CameraContainer.vue";
 import ImageContainer from "src/components/ImageContainer.vue";
 
 export default defineComponent({
   name: "PageIndex",
   components: {
+    // CameraContainer,
     FileContainer,
     ImageContainer,
   },
@@ -31,6 +55,7 @@ export default defineComponent({
     const responseImage = ref(null);
 
     const postImage = (formData) => {
+      responseImage.value = null;
       loading.value = true;
 
       const url = "https://demo.mobbeel.com/mobbscan/detectDocument.json";
@@ -41,7 +66,6 @@ export default defineComponent({
 
       formData.append("licenseId", "mobbscan-challenge");
       formData.append("documentType", "ESP");
-      formData.append("documentSide", 0);
       formData.append("returnDocument", true);
 
       post(url, formData, { headers })
@@ -73,6 +97,7 @@ export default defineComponent({
     };
 
     return {
+      tab: ref("file"),
       file,
       loading,
       responseImage,
@@ -89,5 +114,11 @@ export default defineComponent({
   @include flex-center;
   flex-direction: column;
   gap: $flex-gutter-md;
+
+  .q-tabs .q-tab ::v-deep(.q-tab__content) {
+    display: flex;
+    flex-direction: row;
+    gap: $flex-gutter-md;
+  }
 }
 </style>
