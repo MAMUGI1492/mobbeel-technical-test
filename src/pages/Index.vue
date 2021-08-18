@@ -1,33 +1,12 @@
 <template>
   <q-page class="page-index">
-    <q-card bordered flat>
-      <q-card-section>
-        <q-form @submit.prevent="onSubmit">
-          <q-file
-            v-model="file"
-            accept="image/jpeg"
-            label="Pick one image"
-            name="image"
-            outlined
-          />
+    <file-container
+      v-model:file="file"
+      :loading="loading"
+      @submit="postImage"
+    />
 
-          <div class="flex justify-end">
-            <q-btn
-              :loading="loading"
-              color="primary"
-              label="Submit"
-              type="submit"
-            />
-          </div>
-        </q-form>
-      </q-card-section>
-    </q-card>
-
-    <q-card v-if="responseImage" class="image-card" bordered flat>
-      <q-card-section>
-        <q-img :src="responseImage" fit="contain" width="300px" />
-      </q-card-section>
-    </q-card>
+    <image-container v-if="responseImage" :src="responseImage" />
   </q-page>
 </template>
 
@@ -35,9 +14,15 @@
 import { defineComponent, ref } from "vue";
 import { useQuasar } from "quasar";
 import { post } from "axios";
+import FileContainer from "src/components/FileContainer.vue";
+import ImageContainer from "src/components/ImageContainer.vue";
 
 export default defineComponent({
   name: "PageIndex",
+  components: {
+    FileContainer,
+    ImageContainer,
+  },
   setup() {
     const $q = useQuasar();
 
@@ -89,16 +74,9 @@ export default defineComponent({
 
     return {
       file,
-
-      onSubmit(evt) {
-        const formData = new FormData(evt.target);
-
-        postImage(formData);
-      },
-
       loading,
-
       responseImage,
+      postImage,
     };
   },
 });
@@ -111,11 +89,5 @@ export default defineComponent({
   @include flex-center;
   flex-direction: column;
   gap: $flex-gutter-md;
-
-  .q-card .q-form {
-    display: flex;
-    flex-direction: column;
-    gap: $flex-gutter-md;
-  }
 }
 </style>
