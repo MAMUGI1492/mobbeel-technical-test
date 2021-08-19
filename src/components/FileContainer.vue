@@ -38,6 +38,7 @@ export default defineComponent({
   props: {
     loading: { required: true, type: Boolean },
   },
+  emits: ["submit"],
   setup(props, { emit }) {
     const file = ref(null);
     const side = ref(0);
