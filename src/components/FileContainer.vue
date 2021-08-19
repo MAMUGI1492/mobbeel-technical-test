@@ -3,8 +3,7 @@
     <q-card-section>
       <q-form @submit.prevent="onSubmit">
         <q-file
-          :model-value="file"
-          @update:model-value="onUpdate"
+          v-model="file"
           accept="image/jpeg"
           label="Pick one image"
           name="image"
@@ -37,35 +36,38 @@ import { defineComponent, ref } from "vue";
 export default defineComponent({
   name: "FileContainer",
   props: {
-    file: { required: true, type: Object },
     loading: { required: true, type: Boolean },
   },
-  emits: ["update:file", "submit"],
   setup(props, { emit }) {
+    const file = ref(null);
     const side = ref(0);
 
+    const options = [
+      {
+        label: "Document front side",
+        value: 0,
+      },
+      {
+        label: "Document back side",
+        value: 1,
+      },
+    ];
+
+    const onSubmit = (evt) => {
+      const formData = new FormData(evt.target);
+
+      formData.append("documentSide", side.value);
+
+      emit("submit", formData);
+
+      file.value = null;
+    };
+
     return {
+      file,
       side,
-      options: [
-        {
-          label: "Document front side",
-          value: 0,
-        },
-        {
-          label: "Document back side",
-          value: 1,
-        },
-      ],
-      onSubmit(evt) {
-        const formData = new FormData(evt.target);
-
-        formData.append("documentSide", side.value);
-
-        emit("submit", formData);
-      },
-      onUpdate(newValue) {
-        emit("update:file", newValue);
-      },
+      options,
+      onSubmit,
     };
   },
 });

@@ -15,11 +15,7 @@
 
       <q-tab-panels v-model="tab" animated>
         <q-tab-panel name="file">
-          <file-container
-            v-model:file="file"
-            :loading="loading"
-            @submit="postImage"
-          />
+          <file-container :loading="loading" @submit="postImage" />
         </q-tab-panel>
 
         <q-tab-panel name="camera">
@@ -50,7 +46,6 @@ export default defineComponent({
   setup() {
     const $q = useQuasar();
 
-    const file = ref(null);
     const loading = ref(false);
     const responseImage = ref(null);
 
@@ -73,8 +68,6 @@ export default defineComponent({
           if (data.code === "OK") {
             responseImage.value = `data:image/jpg;base64,${data.imageDocument}`;
 
-            file.value = null;
-
             $q.notify({
               message: "ID document detected!",
               position: "top-right",
@@ -83,8 +76,6 @@ export default defineComponent({
           }
 
           if (data.code === "ERROR") {
-            file.value = null;
-
             $q.notify({
               message: "ID document not detected!",
               position: "top-right",
@@ -98,7 +89,6 @@ export default defineComponent({
 
     return {
       tab: ref("file"),
-      file,
       loading,
       responseImage,
       postImage,
