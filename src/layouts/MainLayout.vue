@@ -39,49 +39,32 @@
 
 <script>
 import EssentialLink from "components/EssentialLink.vue";
+import { mdiEmoticonTongue, mdiVuejs } from "@quasar/extras/mdi-v5";
 
 const linksList = [
   {
-    title: "Docs",
-    caption: "quasar.dev",
-    icon: "school",
-    link: "https://quasar.dev",
+    title: "Manuel Muñoz Gil",
+    caption: "manuelmg.com",
+    icon: mdiEmoticonTongue,
+    link: "https://www.manuelmg.com/",
   },
   {
-    title: "Github",
-    caption: "github.com/quasarframework",
+    title: "Code",
+    caption: "github.com/mobbeel-technical-test",
     icon: "code",
-    link: "https://github.com/quasarframework",
+    link: "https://github.com/MAMUGI1492/mobbeel-technical-test",
   },
   {
-    title: "Discord Chat Channel",
-    caption: "chat.quasar.dev",
-    icon: "chat",
-    link: "https://chat.quasar.dev",
+    title: "Vue.js v3",
+    caption: "v3.vuejs.org",
+    icon: mdiVuejs,
+    link: "https://v3.vuejs.org/",
   },
   {
-    title: "Forum",
-    caption: "forum.quasar.dev",
-    icon: "record_voice_over",
-    link: "https://forum.quasar.dev",
-  },
-  {
-    title: "Twitter",
-    caption: "@quasarframework",
-    icon: "rss_feed",
-    link: "https://twitter.quasar.dev",
-  },
-  {
-    title: "Facebook",
-    caption: "@QuasarFramework",
-    icon: "public",
-    link: "https://facebook.quasar.dev",
-  },
-  {
-    title: "Quasar Awesome",
-    caption: "Community Quasar projects",
+    title: "Quasar Framework v2",
+    caption: "quasar.dev",
     icon: "favorite",
-    link: "https://awesome.quasar.dev",
+    link: "https://quasar.dev",
   },
 ];
 
