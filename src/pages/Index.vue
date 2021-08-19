@@ -1,5 +1,5 @@
 <template>
-  <q-page class="page-index">
+  <q-page class="page-index" padding>
     <q-card>
       <q-tabs v-model="tab">
         <q-tab name="file">
@@ -19,7 +19,7 @@
         </q-tab-panel>
 
         <q-tab-panel name="camera">
-          <!-- <camera-container /> -->
+          <camera-container :loading="loading" @submit="postImage" />
         </q-tab-panel>
       </q-tab-panels>
     </q-card>
@@ -33,13 +33,13 @@ import { defineComponent, ref } from "vue";
 import { useQuasar } from "quasar";
 import { post } from "axios";
 import FileContainer from "src/components/FileContainer.vue";
-// import CameraContainer from "src/components/CameraContainer.vue";
+import CameraContainer from "src/components/CameraContainer.vue";
 import ImageContainer from "src/components/ImageContainer.vue";
 
 export default defineComponent({
   name: "PageIndex",
   components: {
-    // CameraContainer,
+    CameraContainer,
     FileContainer,
     ImageContainer,
   },
