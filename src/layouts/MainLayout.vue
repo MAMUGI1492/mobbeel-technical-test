@@ -19,7 +19,7 @@
 
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered class="bg-grey-1">
       <q-list>
-        <q-item-label header class="text-grey-8">
+        <q-item-label header class="text-primary">
           Essential Links
         </q-item-label>
 

@@ -9,10 +9,10 @@
       <div
         v-if="isCameraOpen"
         v-show="!isLoading"
-        class="camera-box"
         :class="{ flash: isShotPhoto }"
+        class="camera-box"
       >
-        <div class="camera-shutter" :class="{ flash: isShotPhoto }"></div>
+        <div :class="{ flash: isShotPhoto }" class="camera-shutter"></div>
 
         <video
           v-show="!isPhotoTaken"
@@ -33,29 +33,32 @@
 
       <q-btn
         v-if="isCameraOpen"
-        :loading="isLoading || loading"
+        :loading="isLoading"
+        @click="takePhoto"
         color="primary"
         icon="camera"
-        @click="takePhoto"
       />
     </q-card-section>
   </q-card>
 </template>
 
 <script>
+import { useQuasar } from "quasar";
 import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "CameraContainer",
   props: {
-    loading: { required: true, type: Boolean },
+    isLoading: { required: true, type: Boolean },
   },
-  emits: ["submit"],
+  emits: ["change-loading", "submit"],
   setup(props, { emit }) {
+    const $q = useQuasar();
+    const isMobile = !!$q.platform.is.mobile;
+
     const isCameraOpen = ref(false);
     const isPhotoTaken = ref(false);
     const isShotPhoto = ref(false);
-    const isLoading = ref(false);
 
     const camera = ref(null);
     const canvas = ref(null);
@@ -65,26 +68,27 @@ export default defineComponent({
         isCameraOpen.value = false;
         isPhotoTaken.value = false;
         isShotPhoto.value = false;
+
         stopCameraStream();
       } else {
         isCameraOpen.value = true;
+
         createCameraElement();
       }
     };
 
     const createCameraElement = () => {
-      isLoading.value = true;
+      emit("change-loading", true);
 
       const constraints = (window.constraints = {
         audio: false,
-        video: true,
+        video: isMobile ? { facingMode: "user" } : true,
       });
 
       navigator.mediaDevices
         .getUserMedia(constraints)
         .then((stream) => (camera.value.srcObject = stream))
-        .catch((error) => console.error(error))
-        .finally(() => (isLoading.value = false));
+        .catch((error) => console.error(error));
     };
 
     const stopCameraStream = () => {
@@ -113,16 +117,16 @@ export default defineComponent({
     };
 
     const dataURItoBlob = (dataURI) => {
-      // convert base64/URLEncoded data component to raw binary data held in a string
+      // Convert base64/URLEncoded data component to raw binary data held in a string
       let byteString;
       if (dataURI.split(",")[0].indexOf("base64") >= 0)
         byteString = atob(dataURI.split(",")[1]);
       else byteString = unescape(dataURI.split(",")[1]);
 
-      // separate out the mime component
+      // Separate out the mime component
       let mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
 
-      // write the bytes of the string to a typed array
+      // Write the bytes of the string to a typed array
       let ia = new Uint8Array(byteString.length);
       for (var i = 0; i < byteString.length; i++) {
         ia[i] = byteString.charCodeAt(i);
@@ -154,7 +158,6 @@ export default defineComponent({
       isCameraOpen,
       isPhotoTaken,
       isShotPhoto,
-      isLoading,
       camera,
       canvas,
       toggleCamera,
@@ -172,7 +175,6 @@ export default defineComponent({
     justify-content: center;
     align-items: center;
     gap: $flex-gutter-md;
-    width: 500px;
   }
 
   .camera-box {

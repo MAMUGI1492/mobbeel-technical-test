@@ -1,7 +1,12 @@
 <template>
   <q-page class="page-index" padding>
-    <q-card>
-      <q-tabs v-model="tab">
+    <q-card class="tab-panel">
+      <q-tabs
+        v-model="tab"
+        align="justify"
+        class="text-primary"
+        narrow-indicator
+      >
         <q-tab name="file">
           <q-icon name="file_upload" size="sm" />
           <span>File</span>
@@ -13,13 +18,17 @@
         </q-tab>
       </q-tabs>
 
-      <q-tab-panels v-model="tab" animated>
+      <q-tab-panels v-model="tab" animated swipeable>
         <q-tab-panel name="file">
-          <file-container :loading="loading" @submit="postImage" />
+          <file-container
+            :is-loading="isLoading"
+            @change-loading="changeLoading"
+            @submit="postImage"
+          />
         </q-tab-panel>
 
         <q-tab-panel name="camera">
-          <camera-container :loading="loading" @submit="postImage" />
+          <camera-container :is-loading="isLoading" @submit="postImage" />
         </q-tab-panel>
       </q-tab-panels>
     </q-card>
@@ -46,12 +55,14 @@ export default defineComponent({
   setup() {
     const $q = useQuasar();
 
-    const loading = ref(false);
+    const isLoading = ref(false);
     const responseImage = ref(null);
+
+    const changeLoading = (newState) => (isLoading.value = newState);
 
     const postImage = (formData) => {
       responseImage.value = null;
-      loading.value = true;
+      changeLoading(true);
 
       const url = "https://demo.mobbeel.com/mobbscan/detectDocument.json";
 
@@ -84,12 +95,13 @@ export default defineComponent({
           }
         })
         .catch((error) => console.error(error))
-        .finally(() => (loading.value = false));
+        .finally(() => changeLoading(false));
     };
 
     return {
       tab: ref("file"),
-      loading,
+      isLoading,
+      changeLoading,
       responseImage,
       postImage,
     };
@@ -105,10 +117,16 @@ export default defineComponent({
   flex-direction: column;
   gap: $flex-gutter-md;
 
-  .q-tabs .q-tab ::v-deep(.q-tab__content) {
-    display: flex;
-    flex-direction: row;
-    gap: $flex-gutter-md;
+  > .q-card {
+    &.tab-panel {
+      width: 85%;
+    }
+
+    .q-tabs .q-tab ::v-deep(.q-tab__content) {
+      display: flex;
+      flex-direction: row;
+      gap: $flex-gutter-sm;
+    }
   }
 }
 </style>

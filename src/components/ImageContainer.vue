@@ -1,7 +1,7 @@
 <template>
   <q-card class="image-container" bordered flat>
     <q-card-section>
-      <div class="text-h6">Document detected:</div>
+      <div class="text-h6">Last document detected:</div>
     </q-card-section>
 
     <q-separator dark inset />

@@ -19,7 +19,7 @@
 
         <div class="button-containers">
           <q-btn
-            :loading="loading"
+            :loading="isLoading"
             color="primary"
             label="Submit"
             type="submit"
@@ -36,7 +36,7 @@ import { defineComponent, ref } from "vue";
 export default defineComponent({
   name: "FileContainer",
   props: {
-    loading: { required: true, type: Boolean },
+    isLoading: { required: true, type: Boolean },
   },
   emits: ["submit"],
   setup(props, { emit }) {
