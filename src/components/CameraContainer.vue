@@ -82,7 +82,7 @@ export default defineComponent({
 
       const constraints = (window.constraints = {
         audio: false,
-        video: isMobile ? { facingMode: { exact: "environment" } } } : true,
+        video: isMobile ? { facingMode: { exact: "environment" } } : true,
       });
 
       navigator.mediaDevices
