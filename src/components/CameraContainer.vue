@@ -2,7 +2,7 @@
   <q-card class="camera-container" bordered flat>
     <q-card-section>
       <div class="button-containers">
-        <q-btn :flat="isCameraOpen" @click="toggleCamera" color="primary">
+        <q-btn @click="toggleCamera" color="primary">
           <span v-if="isCameraOpen">Close Camera</span>
           <span v-else>Open Camera</span>
         </q-btn>
@@ -14,11 +14,11 @@
           toggle-color="primary"
         >
           <template v-slot:front>
-            <q-icon name="video_camera_back" />
+            <q-icon name="photo_camera_front" />
           </template>
 
           <template v-slot:rear>
-            <q-icon name="photo_camera_front" />
+            <q-icon name="video_camera_back" />
           </template>
         </q-btn-toggle>
       </div>
@@ -128,7 +128,8 @@ export default defineComponent({
       () => cameraType,
       () => {
         toggleCamera();
-        toggleCamera();
+
+        setTimeout(toggleCamera(), 0);
       }
     );
 
