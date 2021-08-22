@@ -8,7 +8,7 @@
         </q-btn>
 
         <q-btn-toggle
-          v-if="isCameraOpen && isMobile"
+          v-if="showOptionGroup"
           v-model="cameraType"
           :options="cameraTypes"
           toggle-color="primary"
@@ -43,7 +43,7 @@
 
 <script>
 import { useQuasar } from "quasar";
-import { defineComponent, ref, watch } from "vue";
+import { computed, defineComponent, ref, watch } from "vue";
 import OptionGroup from "src/components/OptionGroup.vue";
 
 export default defineComponent({
@@ -63,6 +63,10 @@ export default defineComponent({
       { value: "front", slot: "front" },
       { value: "rear", slot: "rear" },
     ];
+
+    const showOptionGroup = computed(
+      () => isCameraOpen.value && isMobile.value
+    );
 
     const video = ref(null);
     const canvas = ref(null);
@@ -136,6 +140,7 @@ export default defineComponent({
       cameraTypes,
       isCameraOpen,
       isMobile,
+      showOptionGroup,
       side,
       toggleCamera,
       takePhoto,
