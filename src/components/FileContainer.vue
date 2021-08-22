@@ -10,12 +10,7 @@
           outlined
         />
 
-        <q-option-group
-          v-model="side"
-          :options="options"
-          color="primary"
-          inline
-        />
+        <option-group v-model.side="side" />
 
         <div class="button-containers">
           <q-btn
@@ -32,9 +27,11 @@
 
 <script>
 import { defineComponent, ref } from "vue";
+import OptionGroup from "src/components/OptionGroup.vue";
 
 export default defineComponent({
   name: "FileContainer",
+  components: { OptionGroup },
   props: {
     isLoading: { required: true, type: Boolean },
   },
@@ -42,17 +39,6 @@ export default defineComponent({
   setup(props, { emit }) {
     const file = ref(null);
     const side = ref(0);
-
-    const options = [
-      {
-        label: "Document front side",
-        value: 0,
-      },
-      {
-        label: "Document back side",
-        value: 1,
-      },
-    ];
 
     const onSubmit = (evt) => {
       const formData = new FormData(evt.target);
@@ -64,12 +50,7 @@ export default defineComponent({
       file.value = null;
     };
 
-    return {
-      file,
-      side,
-      options,
-      onSubmit,
-    };
+    return { file, side, onSubmit };
   },
 });
 </script>

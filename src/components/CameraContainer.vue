@@ -1,43 +1,27 @@
 <template>
   <q-card class="camera-container" bordered flat>
     <q-card-section>
-      <q-btn color="primary" @click="toggleCamera">
-        <span v-if="!isCameraOpen">Open Camera</span>
-        <span v-else>Close Camera</span>
-      </q-btn>
+      <video v-if="isCameraOpen" v-show="!isLoading" ref="video" autoplay />
 
-      <div
-        v-if="isCameraOpen"
-        v-show="!isLoading"
-        :class="{ flash: isShotPhoto }"
-        class="camera-box"
-      >
-        <div :class="{ flash: isShotPhoto }" class="camera-shutter"></div>
+      <canvas v-if="isCameraOpen" v-show="isLoading" ref="canvas" />
 
-        <video
-          v-show="!isPhotoTaken"
-          :height="337.5"
-          :width="450"
-          ref="camera"
-          autoplay
-        ></video>
+      <option-group v-if="isCameraOpen" v-model.side="side" />
 
-        <canvas
-          v-show="isPhotoTaken"
-          :height="337.5"
-          :width="450"
-          id="photoTaken"
-          ref="canvas"
-        ></canvas>
+      <div class="button-containers">
+        <q-btn :flat="isCameraOpen" @click="toggleCamera" color="primary">
+          <span v-if="isCameraOpen">Close Camera</span>
+          <span v-else>Open Camera</span>
+        </q-btn>
+
+        <q-btn
+          v-if="isCameraOpen"
+          :loading="isLoading"
+          @click="takePhoto"
+          color="primary"
+          icon="camera"
+          round
+        />
       </div>
-
-      <q-btn
-        v-if="isCameraOpen"
-        :loading="isLoading"
-        @click="takePhoto"
-        color="primary"
-        icon="camera"
-      />
     </q-card-section>
   </q-card>
 </template>
@@ -45,9 +29,11 @@
 <script>
 import { useQuasar } from "quasar";
 import { defineComponent, ref } from "vue";
+import OptionGroup from "src/components/OptionGroup.vue";
 
 export default defineComponent({
   name: "CameraContainer",
+  components: { OptionGroup },
   props: {
     isLoading: { required: true, type: Boolean },
   },
@@ -56,113 +42,70 @@ export default defineComponent({
     const $q = useQuasar();
     const isMobile = !!$q.platform.is.mobile;
 
-    const isCameraOpen = ref(false);
-    const isPhotoTaken = ref(false);
-    const isShotPhoto = ref(false);
+    const isCameraOpen = ref(true);
 
-    const camera = ref(null);
+    const video = ref(null);
     const canvas = ref(null);
 
-    const toggleCamera = () => {
-      if (isCameraOpen.value) {
-        isCameraOpen.value = false;
-        isPhotoTaken.value = false;
-        isShotPhoto.value = false;
+    const side = ref(0);
 
-        stopCameraStream();
-      } else {
-        isCameraOpen.value = true;
-
-        createCameraElement();
-      }
-    };
+    const toggleCamera = () =>
+      isCameraOpen.value ? stopCameraStream() : createCameraElement();
 
     const createCameraElement = () => {
-      emit("change-loading", true);
+      isCameraOpen.value = true;
 
-      const constraints = (window.constraints = {
-        audio: false,
-        video: isMobile ? { facingMode: { exact: "environment" } } : true,
-      });
+      const videoConstrains = () => {
+        const size = { width: { ideal: 1920 }, height: { ideal: 1080 } };
+        const rearCamera = { facingMode: { exact: "environment" } };
+
+        return isMobile ? { ...rearCamera, ...size } : size;
+      };
+
+      // const constraints = (window.constraints = {
+      //   audio: false,
+      //   video: videoConstrains,
+      // });
+      const constraints = { audio: false, video: videoConstrains };
 
       navigator.mediaDevices
         .getUserMedia(constraints)
-        .then((stream) => (camera.value.srcObject = stream))
+        .then((mediaStream) => (video.value.srcObject = mediaStream))
         .catch((error) => console.error(error));
     };
 
+    const takePhoto = () => {
+      emit("change-loading", true);
+
+      const { videoWidth, videoHeight } = video.value;
+      canvas.value.width = videoWidth;
+      canvas.value.height = videoHeight;
+      const context = canvas.value.getContext("2d");
+      context.drawImage(video.value, 0, 0, videoWidth, videoHeight);
+
+      canvas.value.toBlob(onSubmit, "image/jpeg");
+    };
+
+    const onSubmit = (blob) => {
+      const formData = new FormData();
+
+      formData.append("image", blob);
+      formData.append("documentSide", side.value);
+
+      emit("submit", formData);
+    };
+
     const stopCameraStream = () => {
-      let tracks = camera.value.srcObject.getTracks();
+      isCameraOpen.value = false;
+
+      let tracks = video.value.srcObject.getTracks();
 
       tracks.forEach((track) => track.stop());
     };
 
-    const takePhoto = () => {
-      if (!isPhotoTaken.value) {
-        isShotPhoto.value = true;
+    createCameraElement();
 
-        const FLASH_TIMEOUT = 50;
-
-        setTimeout(() => {
-          isShotPhoto.value = false;
-        }, FLASH_TIMEOUT);
-      }
-
-      isPhotoTaken.value = !isPhotoTaken.value;
-
-      const context = canvas.value.getContext("2d");
-      context.drawImage(camera.value, 0, 0, 450, 337.5);
-
-      onSubmit(canvas.value);
-    };
-
-    const dataURItoBlob = (dataURI) => {
-      // Convert base64/URLEncoded data component to raw binary data held in a string
-      let byteString;
-      if (dataURI.split(",")[0].indexOf("base64") >= 0)
-        byteString = atob(dataURI.split(",")[1]);
-      else byteString = unescape(dataURI.split(",")[1]);
-
-      // Separate out the mime component
-      let mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
-
-      // Write the bytes of the string to a typed array
-      let ia = new Uint8Array(byteString.length);
-      for (var i = 0; i < byteString.length; i++) {
-        ia[i] = byteString.charCodeAt(i);
-      }
-
-      return new Blob([ia], { type: mimeString });
-    };
-
-    const onSubmit = () => {
-      const dataURL = document
-        .getElementById("photoTaken")
-        .toDataURL("image/jpeg");
-
-      const blob = dataURItoBlob(dataURL);
-
-      const formData = new FormData();
-
-      formData.append("image", blob);
-      formData.append("documentSide", 0);
-
-      emit("submit", formData);
-
-      setTimeout(() => {
-        toggleCamera();
-      }, 1500);
-    };
-
-    return {
-      isCameraOpen,
-      isPhotoTaken,
-      isShotPhoto,
-      camera,
-      canvas,
-      toggleCamera,
-      takePhoto,
-    };
+    return { canvas, isCameraOpen, side, toggleCamera, takePhoto, video };
   },
 });
 </script>
@@ -175,19 +118,16 @@ export default defineComponent({
     justify-content: center;
     align-items: center;
     gap: $flex-gutter-md;
-  }
 
-  .camera-box {
-    .camera-shutter {
-      opacity: 0;
-      width: 450px;
-      height: 337.5px;
-      background-color: #fff;
-      position: absolute;
+    video,
+    canvas {
+      max-width: 100%;
+    }
 
-      &.flash {
-        opacity: 1;
-      }
+    .button-containers {
+      display: flex;
+      justify-content: center;
+      gap: $flex-gutter-md;
     }
   }
 }

@@ -28,7 +28,11 @@
         </q-tab-panel>
 
         <q-tab-panel name="camera">
-          <camera-container :is-loading="isLoading" @submit="postImage" />
+          <camera-container
+            :is-loading="isLoading"
+            @change-loading="changeLoading"
+            @submit="postImage"
+          />
         </q-tab-panel>
       </q-tab-panels>
     </q-card>
