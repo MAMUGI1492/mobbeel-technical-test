@@ -62,13 +62,7 @@ export default defineComponent({
         return isMobile ? { ...rearCamera, ...size } : size;
       };
 
-      alert(JSON.stringify(videoConstrains, null, 2));
-
-      const constraints = (window.constraints = {
-        audio: false,
-        video: videoConstrains,
-      });
-      // const constraints = { audio: false, video: videoConstrains };
+      const constraints = { audio: false, video: videoConstrains() };
 
       navigator.mediaDevices
         .getUserMedia(constraints)
