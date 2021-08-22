@@ -1,27 +1,42 @@
 <template>
   <q-card class="camera-container" bordered flat>
     <q-card-section>
-      <video v-if="isCameraOpen" v-show="!isLoading" ref="video" autoplay />
-
-      <canvas v-if="isCameraOpen" v-show="isLoading" ref="canvas" />
-
-      <option-group v-if="isCameraOpen" v-model.side="side" />
-
       <div class="button-containers">
         <q-btn :flat="isCameraOpen" @click="toggleCamera" color="primary">
           <span v-if="isCameraOpen">Close Camera</span>
           <span v-else>Open Camera</span>
         </q-btn>
 
-        <q-btn
-          v-if="isCameraOpen"
-          :loading="isLoading"
-          @click="takePhoto"
-          color="primary"
-          icon="camera"
-          round
-        />
+        <q-btn-toggle
+          v-if="isMobile"
+          v-model="cameraType"
+          :options="cameraTypes"
+          toggle-color="primary"
+        >
+          <template v-slot:front>
+            <q-icon name="video_camera_back" />
+          </template>
+
+          <template v-slot:rear>
+            <q-icon name="photo_camera_front" />
+          </template>
+        </q-btn-toggle>
       </div>
+
+      <video v-if="isCameraOpen" v-show="!isLoading" ref="video" autoplay />
+
+      <canvas v-if="isCameraOpen" v-show="isLoading" ref="canvas" />
+
+      <option-group v-if="isCameraOpen" v-model.side="side" />
+
+      <q-btn
+        v-if="isCameraOpen"
+        :loading="isLoading"
+        @click="takePhoto"
+        color="primary"
+        icon="camera"
+        round
+      />
     </q-card-section>
   </q-card>
 </template>
@@ -43,6 +58,11 @@ export default defineComponent({
     const isMobile = !!$q.platform.is.mobile;
 
     const isCameraOpen = ref(true);
+    const cameraType = ref("front");
+    const cameraTypes = [
+      { value: "front", slot: "front" },
+      { value: "rear", slot: "rear" },
+    ];
 
     const video = ref(null);
     const canvas = ref(null);
@@ -57,9 +77,12 @@ export default defineComponent({
 
       const videoConstrains = () => {
         const size = { width: { ideal: 1920 }, height: { ideal: 1080 } };
-        const rearCamera = { facingMode: { exact: "environment" } };
+        const isRearCamera = cameraType.value.type === "front";
+        const cameraTypeConstraints = {
+          facingMode: isRearCamera ? "user" : { exact: "environment" },
+        };
 
-        return isMobile ? { ...rearCamera, ...size } : size;
+        return isMobile ? { ...cameraTypeConstraints, ...size } : size;
       };
 
       const constraints = { audio: false, video: videoConstrains() };
@@ -101,7 +124,17 @@ export default defineComponent({
 
     createCameraElement();
 
-    return { canvas, isCameraOpen, side, toggleCamera, takePhoto, video };
+    return {
+      canvas,
+      cameraType,
+      cameraTypes,
+      isCameraOpen,
+      isMobile,
+      side,
+      toggleCamera,
+      takePhoto,
+      video,
+    };
   },
 });
 </script>
