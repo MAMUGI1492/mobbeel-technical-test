@@ -77,7 +77,7 @@ export default defineComponent({
 
       const videoConstrains = () => {
         const size = { width: { ideal: 1920 }, height: { ideal: 1080 } };
-        const isRearCamera = cameraType.value.type === "front";
+        const isRearCamera = cameraType.value === "front";
         const cameraTypeConstraints = {
           facingMode: isRearCamera ? "user" : { exact: "environment" },
         };
