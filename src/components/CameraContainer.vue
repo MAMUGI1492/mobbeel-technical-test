@@ -64,9 +64,7 @@ export default defineComponent({
       { value: "rear", slot: "rear" },
     ];
 
-    const showOptionGroup = computed(
-      () => isCameraOpen.value && isMobile.value
-    );
+    const showOptionGroup = computed(() => isCameraOpen.value && isMobile);
 
     const video = ref(null);
     const canvas = ref(null);
@@ -139,7 +137,6 @@ export default defineComponent({
       cameraType,
       cameraTypes,
       isCameraOpen,
-      isMobile,
       showOptionGroup,
       side,
       toggleCamera,
