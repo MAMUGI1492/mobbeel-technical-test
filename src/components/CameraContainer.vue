@@ -8,7 +8,7 @@
         </q-btn>
 
         <q-btn-toggle
-          v-if="isMobile"
+          v-if="isCameraOpen && isMobile"
           v-model="cameraType"
           :options="cameraTypes"
           toggle-color="primary"
