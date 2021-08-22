@@ -124,14 +124,11 @@ export default defineComponent({
 
     createCameraElement();
 
-    watch(
-      () => cameraType,
-      () => {
-        toggleCamera();
+    watch(cameraType, () => {
+      toggleCamera();
 
-        setTimeout(toggleCamera(), 0);
-      }
-    );
+      toggleCamera();
+    });
 
     return {
       canvas,
@@ -157,15 +154,15 @@ export default defineComponent({
     align-items: center;
     gap: $flex-gutter-md;
 
-    video,
-    canvas {
-      max-width: 100%;
-    }
-
     .button-containers {
       display: flex;
       justify-content: center;
       gap: $flex-gutter-md;
+    }
+
+    video,
+    canvas {
+      max-width: 100%;
     }
   }
 }
