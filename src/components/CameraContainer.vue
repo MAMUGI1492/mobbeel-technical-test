@@ -43,7 +43,7 @@
 
 <script>
 import { useQuasar } from "quasar";
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, watch } from "vue";
 import OptionGroup from "src/components/OptionGroup.vue";
 
 export default defineComponent({
@@ -123,6 +123,14 @@ export default defineComponent({
     };
 
     createCameraElement();
+
+    watch(
+      () => cameraType,
+      () => {
+        toggleCamera();
+        toggleCamera();
+      }
+    );
 
     return {
       canvas,
